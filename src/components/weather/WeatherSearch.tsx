@@ -3,36 +3,29 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Search, MapPin, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { Search, MapPin, Loader2 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 interface WeatherSearchProps {
   onSearch: (data: {
     location: string;
     coordinates?: { lat: number; lon: number };
-    dateRange?: { start: string; end: string };
   }) => void;
   loading: boolean;
 }
 
 export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
   const [location, setLocation] = useState('');
-  const [inputType, setInputType] = useState<'city' | 'zip' | 'coordinates' | 'landmark'>('city');
-  const [startDate, setStartDate] = useState<Date>();
-  const [endDate, setEndDate] = useState<Date>();
+  const [inputType, setInputType] = useState<'city' | 'zip' | 'coordinates'>('city');
   const [coordinates, setCoordinates] = useState({ lat: '', lon: '' });
 
   const handleSearch = () => {
     if (!location.trim() && inputType !== 'coordinates') {
       toast({
         title: "Location required",
-        description: "Please enter a location to search for weather data.",
+        description: "Please enter a location.",
         variant: "destructive",
       });
       return;
@@ -51,24 +44,14 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
       const lat = parseFloat(coordinates.lat);
       const lon = parseFloat(coordinates.lon);
 
-      if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
+      if (isNaN(lat) || isNaN(lon)) {
         toast({
           title: "Invalid coordinates",
-          description: "Please enter valid latitude (-90 to 90) and longitude (-180 to 180).",
+          description: "Please enter valid numbers.",
           variant: "destructive",
         });
         return;
       }
-    }
-
-    // Validate date range
-    if (startDate && endDate && startDate > endDate) {
-      toast({
-        title: "Invalid date range",
-        description: "Start date must be before or equal to end date.",
-        variant: "destructive",
-      });
-      return;
     }
 
     const searchData: any = {
@@ -84,21 +67,14 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
       };
     }
 
-    if (startDate && endDate) {
-      searchData.dateRange = {
-        start: format(startDate, 'yyyy-MM-dd'),
-        end: format(endDate, 'yyyy-MM-dd')
-      };
-    }
-
     onSearch(searchData);
   };
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
       toast({
-        title: "Geolocation not supported",
-        description: "Your browser does not support geolocation.",
+        title: "Not supported",
+        description: "Geolocation not supported.",
         variant: "destructive",
       });
       return;
@@ -115,10 +91,10 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
           description: `Current location: ${lat}, ${lon}`,
         });
       },
-      (error) => {
+      () => {
         toast({
-          title: "Location access denied",
-          description: "Unable to access your current location.",
+          title: "Access denied",
+          description: "Unable to access location.",
           variant: "destructive",
         });
       }
@@ -130,7 +106,7 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
       case 'city':
         return (
           <Input
-            placeholder="Enter city name (e.g., London, Paris)"
+            placeholder="Enter city name (e.g., London)"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -139,16 +115,7 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
       case 'zip':
         return (
           <Input
-            placeholder="Enter zip/postal code (e.g., 10001, SW1A 1AA)"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-          />
-        );
-      case 'landmark':
-        return (
-          <Input
-            placeholder="Enter landmark (e.g., Statue of Liberty, Eiffel Tower)"
+            placeholder="Enter zip code (e.g., 10001)"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -181,7 +148,6 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Input Type Selection */}
         <div className="space-y-2">
           <Label>Search Method</Label>
           <Select
@@ -197,20 +163,17 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="city">City Name</SelectItem>
-              <SelectItem value="zip">Zip/Postal Code</SelectItem>
-              <SelectItem value="landmark">Landmark</SelectItem>
+              <SelectItem value="zip">Zip Code</SelectItem>
               <SelectItem value="coordinates">GPS Coordinates</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Location Input */}
         <div className="space-y-2">
           <Label>Location</Label>
           {renderLocationInput()}
         </div>
 
-        {/* Current Location Button */}
         <Button
           variant="outline"
           onClick={getCurrentLocation}
@@ -220,61 +183,6 @@ export const WeatherSearch = ({ onSearch, loading }: WeatherSearchProps) => {
           Use Current Location
         </Button>
 
-        {/* Date Range Selection */}
-        <div className="space-y-2">
-          <Label>Date Range (Optional)</Label>
-          <div className="grid grid-cols-2 gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "justify-start text-left font-normal",
-                    !startDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {startDate ? format(startDate, "PPP") : "Start date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={startDate}
-                  onSelect={setStartDate}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "justify-start text-left font-normal",
-                    !endDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {endDate ? format(endDate, "PPP") : "End date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={endDate}
-                  onSelect={setEndDate}
-                  initialFocus
-                  className="pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-        </div>
-
-        {/* Search Button */}
         <Button 
           onClick={handleSearch} 
           disabled={loading}

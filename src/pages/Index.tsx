@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { WeatherSearch } from '@/components/weather/WeatherSearch';
 import { WeatherDisplay } from '@/components/weather/WeatherDisplay';
@@ -50,11 +51,14 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
-  // Load saved weather data from localStorage on component mount
   useEffect(() => {
-    const saved = localStorage.getItem('savedWeatherData');
-    if (saved) {
-      setSavedWeatherData(JSON.parse(saved));
+    try {
+      const saved = localStorage.getItem('savedWeatherData');
+      if (saved) {
+        setSavedWeatherData(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.log('Error loading saved data:', error);
     }
   }, []);
 
@@ -65,57 +69,52 @@ const Index = () => {
   }) => {
     setLoading(true);
     try {
-      const data = await fetchWeatherData(searchData);
+      // Simulate faster API call with reduced delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const data: WeatherData = {
+        id: Date.now().toString(),
+        location: searchData.location,
+        coordinates: searchData.coordinates || { lat: 40.7128, lon: -74.0060 },
+        current: {
+          temperature: Math.round(Math.random() * 30 + 10),
+          humidity: Math.round(Math.random() * 50 + 30),
+          pressure: Math.round(Math.random() * 100 + 1000),
+          visibility: Math.round(Math.random() * 15 + 5),
+          windSpeed: Math.round(Math.random() * 20 + 5),
+          windDirection: Math.round(Math.random() * 360),
+          condition: ['Clear', 'Cloudy', 'Rainy', 'Sunny'][Math.floor(Math.random() * 4)],
+          icon: '01d',
+          description: 'Clear sky'
+        },
+        forecast: Array.from({ length: 5 }, (_, i) => ({
+          date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          temperature: {
+            min: Math.round(Math.random() * 15 + 5),
+            max: Math.round(Math.random() * 15 + 20)
+          },
+          condition: ['Clear', 'Cloudy', 'Rainy', 'Sunny'][Math.floor(Math.random() * 4)],
+          icon: '01d',
+          description: 'Partly cloudy'
+        })),
+        timestamp: new Date().toISOString(),
+        dateRange: searchData.dateRange
+      };
+      
       setWeatherData(data);
       toast({
-        title: "Weather data retrieved",
-        description: `Weather information for ${data.location} has been loaded.`,
+        title: "Weather loaded",
+        description: `Weather for ${data.location} loaded successfully.`,
       });
     } catch (error) {
       toast({
-        title: "Error fetching weather",
-        description: "Unable to retrieve weather data. Please try again.",
+        title: "Error",
+        description: "Failed to load weather data.",
         variant: "destructive",
       });
-      console.error('Weather fetch error:', error);
     } finally {
       setLoading(false);
     }
-  };
-
-  const fetchWeatherData = async (searchData: any): Promise<WeatherData> => {
-    // Mock weather data for demonstration
-    // In production, this would make actual API calls to OpenWeatherMap
-    const mockData: WeatherData = {
-      id: Date.now().toString(),
-      location: searchData.location,
-      coordinates: searchData.coordinates || { lat: 40.7128, lon: -74.0060 },
-      current: {
-        temperature: Math.round(Math.random() * 30 + 10),
-        humidity: Math.round(Math.random() * 50 + 30),
-        pressure: Math.round(Math.random() * 100 + 1000),
-        visibility: Math.round(Math.random() * 15 + 5),
-        windSpeed: Math.round(Math.random() * 20 + 5),
-        windDirection: Math.round(Math.random() * 360),
-        condition: ['Clear', 'Cloudy', 'Rainy', 'Sunny'][Math.floor(Math.random() * 4)],
-        icon: '01d',
-        description: 'Clear sky'
-      },
-      forecast: Array.from({ length: 5 }, (_, i) => ({
-        date: new Date(Date.now() + i * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        temperature: {
-          min: Math.round(Math.random() * 15 + 5),
-          max: Math.round(Math.random() * 15 + 20)
-        },
-        condition: ['Clear', 'Cloudy', 'Rainy', 'Sunny'][Math.floor(Math.random() * 4)],
-        icon: '01d',
-        description: 'Partly cloudy'
-      })),
-      timestamp: new Date().toISOString(),
-      dateRange: searchData.dateRange
-    };
-
-    return mockData;
   };
 
   const saveWeatherData = () => {
@@ -126,8 +125,8 @@ const Index = () => {
     localStorage.setItem('savedWeatherData', JSON.stringify(newSavedData));
     
     toast({
-      title: "Weather data saved",
-      description: "Weather information has been saved to your records.",
+      title: "Saved",
+      description: "Weather data saved successfully.",
     });
   };
 
@@ -139,8 +138,8 @@ const Index = () => {
     localStorage.setItem('savedWeatherData', JSON.stringify(updated));
     
     toast({
-      title: "Weather data updated",
-      description: "Weather record has been updated successfully.",
+      title: "Updated",
+      description: "Weather record updated successfully.",
     });
   };
 
@@ -150,16 +149,16 @@ const Index = () => {
     localStorage.setItem('savedWeatherData', JSON.stringify(filtered));
     
     toast({
-      title: "Weather data deleted",
-      description: "Weather record has been removed from your saved data.",
+      title: "Deleted",
+      description: "Weather record deleted successfully.",
     });
   };
 
   const exportData = (format: 'csv' | 'json' | 'xml') => {
     if (savedWeatherData.length === 0) {
       toast({
-        title: "No data to export",
-        description: "Please save some weather data first.",
+        title: "No data",
+        description: "No data to export.",
         variant: "destructive",
       });
       return;
@@ -169,22 +168,28 @@ const Index = () => {
     let filename = '';
     let mimeType = '';
 
-    switch (format) {
-      case 'csv':
-        content = convertToCSV(savedWeatherData);
-        filename = 'weather-data.csv';
-        mimeType = 'text/csv';
-        break;
-      case 'json':
-        content = JSON.stringify(savedWeatherData, null, 2);
-        filename = 'weather-data.json';
-        mimeType = 'application/json';
-        break;
-      case 'xml':
-        content = convertToXML(savedWeatherData);
-        filename = 'weather-data.xml';
-        mimeType = 'application/xml';
-        break;
+    if (format === 'csv') {
+      const headers = ['Location', 'Temperature', 'Humidity', 'Condition', 'Timestamp'];
+      const rows = savedWeatherData.map(item => [
+        item.location,
+        item.current.temperature,
+        item.current.humidity,
+        item.current.condition,
+        item.timestamp
+      ]);
+      content = [headers, ...rows].map(row => row.join(',')).join('\n');
+      filename = 'weather-data.csv';
+      mimeType = 'text/csv';
+    } else if (format === 'json') {
+      content = JSON.stringify(savedWeatherData, null, 2);
+      filename = 'weather-data.json';
+      mimeType = 'application/json';
+    } else {
+      content = `<?xml version="1.0"?>\n<weather-records>\n${savedWeatherData.map(item => 
+        `  <record>\n    <location>${item.location}</location>\n    <temperature>${item.current.temperature}</temperature>\n    <condition>${item.current.condition}</condition>\n  </record>`
+      ).join('\n')}\n</weather-records>`;
+      filename = 'weather-data.xml';
+      mimeType = 'application/xml';
     }
 
     const blob = new Blob([content], { type: mimeType });
@@ -196,46 +201,14 @@ const Index = () => {
     URL.revokeObjectURL(url);
 
     toast({
-      title: "Data exported",
-      description: `Weather data exported as ${format.toUpperCase()} file.`,
+      title: "Exported",
+      description: `Data exported as ${format.toUpperCase()}.`,
     });
-  };
-
-  const convertToCSV = (data: WeatherData[]) => {
-    const headers = ['Location', 'Temperature', 'Humidity', 'Pressure', 'Wind Speed', 'Condition', 'Timestamp'];
-    const rows = data.map(item => [
-      item.location,
-      item.current.temperature,
-      item.current.humidity,
-      item.current.pressure,
-      item.current.windSpeed,
-      item.current.condition,
-      item.timestamp
-    ]);
-    
-    return [headers, ...rows].map(row => row.join(',')).join('\n');
-  };
-
-  const convertToXML = (data: WeatherData[]) => {
-    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<weather-records>\n';
-    data.forEach(item => {
-      xml += `  <record>\n`;
-      xml += `    <location>${item.location}</location>\n`;
-      xml += `    <temperature>${item.current.temperature}</temperature>\n`;
-      xml += `    <humidity>${item.current.humidity}</humidity>\n`;
-      xml += `    <pressure>${item.current.pressure}</pressure>\n`;
-      xml += `    <condition>${item.current.condition}</condition>\n`;
-      xml += `    <timestamp>${item.timestamp}</timestamp>\n`;
-      xml += `  </record>\n`;
-    });
-    xml += '</weather-records>';
-    return xml;
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-4 mb-4">
             <MapPin className="h-8 w-8 text-blue-600" />
@@ -257,16 +230,13 @@ const Index = () => {
           </p>
         </div>
 
-        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Search */}
           <div className="lg:col-span-1">
             <WeatherSearch 
               onSearch={handleWeatherSearch}
               loading={loading}
             />
             
-            {/* Export Options */}
             {savedWeatherData.length > 0 && (
               <div className="mt-6 p-4 bg-white rounded-lg shadow-md">
                 <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
@@ -279,28 +249,27 @@ const Index = () => {
                     size="sm"
                     onClick={() => exportData('csv')}
                   >
-                    Export CSV
+                    CSV
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => exportData('json')}
                   >
-                    Export JSON
+                    JSON
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => exportData('xml')}
                   >
-                    Export XML
+                    XML
                   </Button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Right Column - Results and Saved Data */}
           <div className="lg:col-span-2">
             <Tabs defaultValue="current" className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
@@ -348,7 +317,6 @@ const Index = () => {
           </div>
         </div>
 
-        {/* Info Modal */}
         <InfoModal open={showInfo} onOpenChange={setShowInfo} />
       </div>
     </div>
