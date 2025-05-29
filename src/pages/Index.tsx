@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { WeatherSearch } from '@/components/weather/WeatherSearch';
 import { WeatherDisplay } from '@/components/weather/WeatherDisplay';
@@ -254,7 +253,7 @@ const Index = () => {
             Search for weather by city, zip code, coordinates, or landmarks
           </p>
           <p className="text-sm text-gray-500 mt-2">
-            Developed by <span className="font-semibold">Gautam</span>
+            Developed by <span className="font-semibold">Gautam Reddy K</span>
           </p>
         </div>
 
