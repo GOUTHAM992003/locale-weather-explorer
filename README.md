@@ -1,73 +1,144 @@
-# Welcome to your Lovable project
 
-## Project info
+# Advanced Weather Application
 
-**URL**: https://lovable.dev/projects/ab1d03d7-12fe-4a52-b6e9-5b0a24407cef
+A comprehensive weather application built as a submission for PM Accelerator, featuring real-time weather data, location search, and full CRUD operations.
 
-## How can I edit this code?
+## Developer
 
-There are several ways of editing your application.
+**Gautam** - Built for PM Accelerator  
+Learn more at: [PM Accelerator](https://www.linkedin.com/company/product-manager-accelerator)
 
-**Use Lovable**
+## Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ab1d03d7-12fe-4a52-b6e9-5b0a24407cef) and start prompting.
+### 🔍 Flexible Location Search
+- City name search (e.g., "London", "New York")
+- Zip/postal code lookup (e.g., "10001", "SW1A 1AA")
+- GPS coordinates (e.g., "40.7128,-74.0060")
+- Landmark search (e.g., "Statue of Liberty")
+- Current location detection using browser geolocation
 
-Changes made via Lovable will be committed automatically to this repo.
+### 📊 Weather Information
+- **Current Weather**: Temperature, humidity, pressure, wind speed/direction, visibility
+- **5-Day Forecast**: Extended weather predictions
+- **Dual Units**: Display in both Celsius and Fahrenheit
+- **Weather Icons**: Visual representation of weather conditions
 
-**Use your preferred IDE**
+### 💾 CRUD Operations
+- **Create**: Save weather queries with location and timestamp
+- **Read**: View all previously saved weather records
+- **Update**: Modify saved location data and refresh weather information
+- **Delete**: Remove saved weather entries
+- **Persistent Storage**: Data saved locally with browser localStorage
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### 📤 Export Functionality
+- Export saved weather data in multiple formats:
+  - CSV (Comma-separated values)
+  - JSON (JavaScript Object Notation)
+  - XML (Extensible Markup Language)
+- Date range filtering for exports
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🗺️ Interactive Maps
+- Location visualization using OpenStreetMap
+- External links to Google Maps and OpenStreetMap
+- Coordinate display with precise latitude/longitude
 
-Follow these steps:
+### ✅ Input Validation & Error Handling
+- Location validation through API lookup
+- Graceful handling of network errors
+- User-friendly error messages
+- Input sanitization and validation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## Technology Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Frontend**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: Shadcn/ui component library
+- **Icons**: Lucide React
+- **Build Tool**: Vite
+- **Data Storage**: Browser localStorage (ready for database integration)
 
-# Step 3: Install the necessary dependencies.
-npm i
+## Installation & Setup
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### Prerequisites
+- Node.js (version 16 or higher)
+- npm or yarn package manager
 
-**Edit a file directly in GitHub**
+### Getting Started
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd advanced-weather-app
+   ```
 
-**Use GitHub Codespaces**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3. **Start the development server**
+   ```bash
+   npm run dev
+   ```
 
-## What technologies are used for this project?
+4. **Open your browser**
+   Navigate to `http://localhost:8080` to view the application
 
-This project is built with:
+### Available Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Build the application for production
+- `npm run preview` - Preview the production build locally
 
-## How can I deploy this project?
+## Usage
 
-Simply open [Lovable](https://lovable.dev/projects/ab1d03d7-12fe-4a52-b6e9-5b0a24407cef) and click on Share -> Publish.
+1. **Search for Weather**
+   - Enter a location in the search field (city, zip code, coordinates, or landmark)
+   - Or click "Use Current Location" to get weather for your location
+   - View current conditions and 5-day forecast
 
-## Can I connect a custom domain to my Lovable project?
+2. **Save Weather Data**
+   - Click "Save Weather Data" to store the current search results
+   - Add optional notes for future reference
 
-Yes, you can!
+3. **Manage Saved Records**
+   - View all saved weather records in the "Saved Weather Records" section
+   - Update location data and refresh weather information
+   - Delete records you no longer need
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+4. **Export Data**
+   - Use the export functionality to download your saved weather data
+   - Choose from CSV, JSON, or XML formats
+   - Filter by date range if needed
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+5. **View Maps**
+   - Click on any location to view it on an interactive map
+   - Get precise coordinates and external map links
+
+## Future Enhancements
+
+- **Real-time API Integration**: Connect to OpenWeatherMap API for live weather data
+- **Database Backend**: Implement PostgreSQL or MongoDB for robust data storage
+- **User Authentication**: Add user accounts and profiles
+- **Weather Alerts**: Push notifications for severe weather conditions
+- **Advanced Analytics**: Charts and graphs for weather trends
+- **Mobile App**: React Native version for iOS and Android
+
+## API Integrations (Planned)
+
+- **OpenWeatherMap API**: Real-time weather data
+- **Google Maps API**: Enhanced mapping features
+- **YouTube API**: Location-based videos
+- **Browser Geolocation API**: Current location detection
+
+## Contributing
+
+This project was built as an educational exercise for PM Accelerator. Feel free to fork and enhance!
+
+## License
+
+This project is open source and available under the MIT License.
+
+---
+
+**Built with ❤️ by Gautam for PM Accelerator**
